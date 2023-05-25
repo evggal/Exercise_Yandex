@@ -1,0 +1,404 @@
+<html>
+    <head>
+        <title></title>
+        <script>
+function Block(id, form) {
+    this.id = id;
+    this.form = form;
+}
+
+function LayoutResult(blockId,position,isRotated) {
+    this.blockId = blockId;
+    this.position = position;
+    this.isRotated = isRotated;
+}
+
+function inversMas(mas) {
+    let rezMas = [];
+    for (var i=0; i<mas.length; i++) {
+        rezMas.push(mas[i] ? 0 : 1);
+    }
+    return rezMas;
+}
+
+function reversMas(mas) {
+    let rezMas = [];
+    for (var i=mas.length-1; i>=0; --i) {
+        rezMas.push(mas[i]);
+    }
+    return rezMas;
+}
+
+const blocks = [
+    new Block(1,[
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [0,0,0,0,1,1,1],
+        [0,0,0,0,1,1,1]
+    ]),
+    new Block(2,[
+        [1,1,1,1,0,0,0],
+        [1,1,1,1,0,0,0],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [0,1,1,1,1,1,1],
+        [0,0,1,1,1,1,1],
+        [0,0,0,1,1,1,1],
+        [0,0,0,0,1,1,1],
+        [0,0,0,0,0,1,1],
+        [0,0,0,0,0,0,1]
+    ]),
+    new Block(3,[
+        [0,0,0,0,1,1,1],
+        [0,0,0,0,1,1,1],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [0,1,1,1,1,1,1],
+        [0,0,1,1,1,1,1],
+        [0,0,0,1,1,1,1],
+        [0,0,0,0,1,1,1],
+        [0,0,0,0,0,1,1],
+        [0,0,0,0,0,0,1]
+    ]),
+    new Block(4,[
+        [0,0,0,1,1,1,1],
+        [0,0,0,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [0,0,1,1,1,0,0]
+    ]),
+    new Block(5,[
+        [1,1,0,0,0,1,1],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [1,1,0,0,0,1,1],
+        [1,1,0,0,0,1,1]
+    ]),
+    new Block(6,[
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,0,0],
+        [1,1,0,0,0,0,0]
+    ]),
+    new Block(7,[
+        [0,0,1,1,1,0,0],
+        [0,0,1,1,1,0,0],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [1,0,1,0,1,0,1],
+        [1,0,0,0,0,0,1]
+    ]),
+    new Block(8,[
+        [0,1,0,1,0,1,0],
+        [0,1,1,1,1,1,0],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [1,0,0,0,0,1,1],
+        [1,1,0,0,0,1,1],
+        [1,0,0,0,0,1,1]
+    ]),
+    new Block(9,[
+        [0,0,1,1,1,0,0],
+        [1,1,1,1,1,1,0],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [0,0,1,1,1,1,0],
+        [0,0,1,1,1,0,0],
+        [0,0,1,1,1,1,0]
+    ]),
+    new Block(10,[
+        [1,0,0,0,0,0,0],
+        [1,1,0,0,0,1,1],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [0,1,1,1,1,0,0],
+        [0,1,1,0,0,0,0]
+    ]),
+    new Block(11,[
+        [1,0,0,0,0,1,1],
+        [1,0,0,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,0,0],
+        [1,1,0,0,0,0,0]
+    ])
+];
+/*
+const blocks = [{
+    "id": 1,
+    "form": [
+      [1, 0, 1],
+      [1, 1, 1],
+      [1, 1, 1]
+    ]
+  },
+  {
+    "id": 2,
+    "form": [
+      [0, 0, 1],
+      [1, 1, 1],
+      [1, 1, 1],
+      [1, 1, 1],
+      [1, 1, 1]
+    ]
+  },
+  {
+    "id": 3,
+    "form": [
+      [0, 1, 1],
+      [1, 1, 1],
+      [0, 1, 0]
+    ]
+}];*/
+
+    var mask = {
+        mask1 : [],
+        mask2: []
+    }
+    var count = 1
+    mask.mask1.push([]);
+    mask.mask2.push([]);
+    var rez = [];
+    for (var i = 0; i<blocks[0].form[0].length; i++) {
+        mask.mask1[0].push(1);
+        mask.mask2[0].push(1);
+    }
+    while (blocks.length!=0) {
+    for (var i = 0; i < blocks.length; i++) {
+        var flagMask1 = true;
+        var flagMask2 = true;
+        for (var j = 0; j < mask.mask1.length; j++) {
+            flagMask1 = flagMask1 && JSON.stringify(mask.mask1[j]) === JSON.stringify(blocks[i].form[j]);
+            flagMask2 = flagMask2 && JSON.stringify(mask.mask2[mask.mask2.length-j-1]) === JSON.stringify(blocks[i].form[blocks[i].form.length-j-1]);
+        }
+        if (flagMask1) {
+            rez.push(new LayoutResult(blocks[i].id, count++, true));
+            mask = {
+                mask1 : [],
+                mask2: []
+            }
+            var el=blocks[i].form.length-1;
+            while (blocks[i].form[el].indexOf(0)>-1 && el>=0) {
+                mask.mask1.unshift(inversMas(blocks[i].form[el]));
+                mask.mask2.push(inversMas(reversMas(blocks[i].form[el])));
+                el--;
+            }
+            blocks.splice(i,1);
+            break;
+        } else if (flagMask2) {
+            rez.push(new LayoutResult(blocks[i].id, count++, false));
+            mask = {
+                mask1 : [],
+                mask2: []
+            }
+            var el=0;
+            while (blocks[i].form[el].indexOf(0)>-1 && el<blocks[i].form.length) {
+                mask.mask1.unshift(inversMas(reversMas(blocks[i].form[el])));
+                mask.mask2.push(inversMas(blocks[i].form[el]));
+                el++;
+            }
+            blocks.splice(i,1);
+            break;
+        }
+    }
+    }
+
+        </script>
+<script type="module">
+    import {layout} from "./Exercise1.js"
+</script>
+<!--<script>
+    
+  /*  const blocks = [
+    new Block(1,[
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [0,0,0,0,1,1,1],
+        [0,0,0,0,1,1,1]
+    ]),
+    new Block(2,[
+        [1,1,1,1,0,0,0],
+        [1,1,1,1,0,0,0],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [0,1,1,1,1,1,1],
+        [0,0,1,1,1,1,1],
+        [0,0,0,1,1,1,1],
+        [0,0,0,0,1,1,1],
+        [0,0,0,0,0,1,1],
+        [0,0,0,0,0,0,1]
+    ]),
+    new Block(3,[
+        [0,0,0,0,1,1,1],
+        [0,0,0,0,1,1,1],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [0,1,1,1,1,1,1],
+        [0,0,1,1,1,1,1],
+        [0,0,0,1,1,1,1],
+        [0,0,0,0,1,1,1],
+        [0,0,0,0,0,1,1],
+        [0,0,0,0,0,0,1]
+    ]),
+    new Block(4,[
+        [0,0,0,1,1,1,1],
+        [0,0,0,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [0,0,1,1,1,0,0]
+    ]),
+    new Block(5,[
+        [1,1,0,0,0,1,1],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [1,1,0,0,0,1,1],
+        [1,1,0,0,0,1,1]
+    ]),
+    new Block(6,[
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,0,0],
+        [1,1,0,0,0,0,0]
+    ]),
+    new Block(7,[
+        [0,0,1,1,1,0,0],
+        [0,0,1,1,1,0,0],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [1,0,1,0,1,0,1],
+        [1,0,0,0,0,0,1]
+    ]),
+    new Block(8,[
+        [0,1,0,1,0,1,0],
+        [0,1,1,1,1,1,0],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [1,0,0,0,0,1,1],
+        [1,1,0,0,0,1,1],
+        [1,0,0,0,0,1,1]
+    ]),
+    new Block(9,[
+        [0,0,1,1,1,0,0],
+        [1,1,1,1,1,1,0],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [0,0,1,1,1,1,0],
+        [0,0,1,1,1,0,0],
+        [0,0,1,1,1,1,0]
+    ]),
+    new Block(10,[
+        [1,0,0,0,0,0,0],
+        [1,1,0,0,0,1,1],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [0,1,1,1,1,0,0],
+        [0,1,1,0,0,0,0]
+    ]),
+    new Block(11,[
+        [1,0,0,0,0,1,1],
+        [1,0,0,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1],
+        [1,1,1,1,1,0,0],
+        [1,1,0,0,0,0,0]
+    ])
+];*/
+function Block(id, form) {
+    this.id = id;
+    this.form = form;
+}
+
+function LayoutResult(blockId,position,isRotated) {
+    this.blockId = blockId;
+    this.position = position;
+    this.isRotated = isRotated;
+}
+
+function inversMas(mas) {
+    let rezMas = [];
+    for (var i=0; i<mas.length; i++) {
+        rezMas.push(mas[i] ? 0 : 1);
+    }
+    return rezMas;
+}
+
+function reversMas(mas) {
+    let rezMas = [];
+    for (var i=mas.length-1; i>=0; --i) {
+        rezMas.push(mas[i]);
+    }
+    return rezMas;
+}
+
+blocks = [];
+function layout(blocks) { 
+    if (blocks.length == 0) {return ''}
+    var mask = {
+        mask1 : [],
+        mask2: []
+    }
+    var count = 1
+    mask.mask1.push([]);
+    mask.mask2.push([]);
+    var rez = [];
+    for (var i = 0; i<blocks[0].form[0].length; i++) {
+        mask.mask1[0].push(1);
+        mask.mask2[0].push(1);
+    }
+    while (blocks.length!=0) {
+        for (var i = 0; i < blocks.length; i++) {
+            var flagMask1 = true;
+            var flagMask2 = true;
+            for (var j = 0; j < mask.mask1.length; j++) {
+                flagMask1 = flagMask1 && JSON.stringify(mask.mask1[j]) === JSON.stringify(blocks[i].form[j]);
+                flagMask2 = flagMask2 && JSON.stringify(mask.mask2[mask.mask2.length-j-1]) === JSON.stringify(blocks[i].form[blocks[i].form.length-j-1]);
+            }
+            if (flagMask1) {
+                rez.push(new LayoutResult(blocks[i].id, count++, true));
+                mask = {
+                    mask1 : [],
+                    mask2: []
+                }
+                var el=blocks[i].form.length-1;
+                while (blocks[i].form[el].indexOf(0)>-1 && el>=0) {
+                    mask.mask1.unshift(inversMas(blocks[i].form[el]));
+                    mask.mask2.push(inversMas(reversMas(blocks[i].form[el])));
+                    el--;
+                }
+                blocks.splice(i,1);
+                break;
+            } else if (flagMask2) {
+                rez.push(new LayoutResult(blocks[i].id, count++, false));
+                mask = {
+                    mask1 : [],
+                    mask2: []
+                }
+                var el=0;
+                while (blocks[i].form[el].indexOf(0)>-1 && el<blocks[i].form.length) {
+                    mask.mask1.unshift(inversMas(reversMas(blocks[i].form[el])));
+                    mask.mask2.push(inversMas(blocks[i].form[el]));
+                    el++;
+                }
+                blocks.splice(i,1);
+                break;
+            }
+    
+        }
+    }}
+    rez = layout(blocks);
+
+
+    </script>-->
+    </head>
+    <body>
+        <p>Hello!</p>
+    </body>
+</html>

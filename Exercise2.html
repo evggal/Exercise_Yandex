@@ -1,0 +1,130 @@
+<html>
+    <head>
+    
+    </head>
+    <body>
+        <entry>
+                <div x-make="remove:0">
+                    <div x-make="remove:2">Блок 1</div>
+                    <span>Блок 2</span>
+                </div>
+                <div x-make="copy:4">
+                    <div x-make="remove:5">Блок 3</div>
+                    <div x-make="switch:1">Блок 4</div>
+                </div>
+                <p x-make="copy:4">Блок 5</p>
+
+        </entry>
+    </body>
+    <script>
+        //solution
+        //сначала все copy-операции, потом — remove, далее — removeChildren, а switch — в последнюю очередь.
+        var startElem = document.querySelector('entry');
+        //var o = start.getAttribute("x-make"); // получаем атрибут тега
+        /*if (start.hasChildNodes()) { // проверяем наличие потомков
+            var children = start.childNodes; // все потомки
+            for (var i=0; i<children.length; i++) {
+
+            }
+        }*/
+
+        function solution(startElem) {
+            if (startElem.hasChildNodes()) { // проверяем наличие потомков
+                var children = startElem.childNodes; // все потомки
+                var queue = {
+                    copy:[],
+                    remove:[],
+                    removeChildren:[],
+                    switch:[]
+                };
+                for (var i=0; i<children.length; i++) {
+                    if (children[i].tagName!=undefined) {
+                    if (children[i].getAttribute("x-make")) {
+                        var make = children[i].getAttribute("x-make").split(':');
+                        console.log(make);
+                        queue[make[0]].push({el:children[i],make:make[0],col:make[1]*1});
+                    }
+                    
+                }
+                }
+                for (var j=0; j<queue.copy.length; j++) {
+                    for (var k=0; k<queue.copy[j].col; k++) {
+                        queue.copy[j].el.removeAttribute("x-make")
+                        clone = queue.copy[j].el.cloneNode(true);
+                        queue.copy[j].el.after(clone)
+                        console.log("copy");    
+                    }
+                    
+                }
+                console.log(startElem.childNodes);
+                
+                for (var j=0; j<queue.remove.length; j++) {
+                    var count = 0;
+                    flag = false;
+                    var children = startElem.childNodes;
+                    console.log(children);
+                    for (var i=0; i<children.length; i++) {
+                        if (children[i].tagName!=undefined) {                
+                        if (flag) {
+                            children[i].remove();
+                            count+=1;
+                            console.log("remove");
+                        }
+                        if (children[i]==queue.remove[j].el) {
+                            flag = true;
+                        }                       
+                        }
+                        console.log(i);
+                        if (count>=queue.remove[j].col) {
+                            console.log(count);
+                            break
+                        }
+                    }
+                    queue.remove[j].el.removeAttribute("x-make")
+                    
+                }
+                
+                for (var j=0; j<queue.removeChildren.length; j++) {
+                    if (queue.removeChildren[j].el.hasChildNodes()) {
+                        var child = queue.removeChildren[j].el.childNodes;
+                        count = 0;
+                        for (var i=0; i<child.length; i+=1) {
+                            if (child[i].tagName!=undefined) {
+                                child[i].remove();
+                                console.log("removeChildren");
+                                count++;
+                            }
+                            if (count>=queue.removeChildren[j].col) {break}
+                        }
+                    }                    
+                    queue.removeChildren[j].el.removeAttribute("x-make")
+                }
+                /*for (var j=0; j<queue.switch.length; j++) {
+                    count = 0
+                    for (var i=0; i<children.length*queue.switch[j].col; i+=1) {
+                        if (children[i%children.length].tagName!=undefined) {
+                            count+=1;
+                            if (count==queue.switch[j].col) {
+                                elsmen = children[i%children.length];
+                                break
+                            }
+                        } 
+                    }
+                    queue.switch[j].el.replaceWith(elsmen);
+                    elsmen.replaceWith(queue.switch[j].el);
+                    console.log("switch");
+                }*/
+            }
+            /*for (var i=0; i<children.length; i++) {
+                    if (children[i].tagName!=undefined) {
+                        if (children[i].getAttribute("x-make")) {
+                            solution(children[i]);
+                        }
+                }
+            }*/
+        }
+  
+        solution(startElem);
+
+    </script>
+</html>
